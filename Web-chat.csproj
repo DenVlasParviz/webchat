@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Web_chat</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\dist\assets\index-BtRDmKJ9.js" />
+      <None Include="wwwroot\dist\assets\index-CrXw9O2d.css" />
+      <None Include="wwwroot\dist\favicon.ico" />
+      <None Include="wwwroot\dist\index.html" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\Migrations\" />
+      <Folder Include="Server\" />
+    </ItemGroup>
+
+</Project>

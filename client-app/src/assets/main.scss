@@ -1,6 +1,5 @@
-
 body {
-//background-image: url('https://images.unsplash.com/photo-1560568082-c15188aa6510?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3300&q=80');
+  //background-image: url('https://images.unsplash.com/photo-1560568082-c15188aa6510?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3300&q=80');
   background-color: #3498db;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -12,16 +11,13 @@ body {
   background: #fff;
   padding: 0;
   border-radius: 7px;
-
 }
-.chat-wrapper{
-  display:flex;
+.chat-wrapper {
+  display: flex;
   flex-direction: column;
-  height: 80vh
-
-
+  height: 80vh;
 }
-.messages-area{
+.messages-area {
   flex: 1 1 auto;
   overflow-y: auto;
 }
@@ -49,10 +45,10 @@ body {
       font-size: 25px;
       color: grey;
       margin-left: 14px;
-      transition: .3s;
+      transition: 0.3s;
 
       &:hover {
-        color:blue;
+        color: blue;
         cursor: pointer;
       }
     }
@@ -96,7 +92,7 @@ input {
   display: flex;
   vertical-align: baseline;
   background: #fff;
-  transition: .3s ease;
+  transition: 0.3s ease;
 
   &--grey {
     background: #eee;
@@ -119,61 +115,58 @@ input {
   .time {
     color: grey;
   }
-  &--onhover:hover{
-    background:blue;
-    cursor:pointer;
-    p,h6,
-    .time{
+  &--onhover:hover {
+    background: blue;
+    cursor: pointer;
+    p,
+    h6,
+    .time {
       color: #fff;
     }
   }
-  hr{
+  hr {
     margin: 5px auto;
     width: 60%;
   }
-  }
-.chat-bubble{
+}
+.chat-bubble {
   padding: 10px 14px;
   background: #eee;
   margin: 10px;
   border-radius: 9px;
   position: relative;
 
-
-  &--blue{
+  &--blue {
     background: blue;
-    color:#fff;
+    color: #fff;
   }
-  &:after{
-    content:'';
+  &:after {
+    content: '';
     position: absolute;
     top: 50%;
     width: 0;
-    border:20px solid transparent;
-    border-bottom:0;
-    margin-top:-10px;
-      }
-
-
+    border: 20px solid transparent;
+    border-bottom: 0;
+    margin-top: -10px;
+  }
 }
-.chat-box-tray{
+.chat-box-tray {
   background: #eee;
   display: flex;
   align-items: baseline;
   padding: 10px 15px;
   flex: 0 0 auto;
-  margin-top:19px;
-  input{
+  margin-top: 19px;
+  input {
     margin: 0 10px;
     padding: 6px 2px;
-      }
-  i{
-    color:gray;
+  }
+  i {
+    color: gray;
     font-size: 14px;
     vertical-align: middle;
-    &:last-of-type{
-      margin-left:25px;
+    &:last-of-type {
+      margin-left: 25px;
     }
   }
 }
-

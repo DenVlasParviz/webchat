@@ -9,24 +9,23 @@ export default defineConfig({
         target: 'http://localhost:5146',
         changeOrigin: true,
         secure: false,
-        ws:true,
+        ws: true,
       },
       '/api': {
         target: 'http://localhost:5146',
         changeOrigin: true,
-        secure: false
+        secure: false,
       },
       '/chat': {
         target: 'http://localhost:5146',
         changeOrigin: true,
         secure: false,
-        ws: false
+        ws: false,
       },
     },
-
   },
   build: {
     outDir: '../MyMvcApp/wwwroot',
-    emptyOutDir: true
-  }
+    emptyOutDir: true,
+  },
 })

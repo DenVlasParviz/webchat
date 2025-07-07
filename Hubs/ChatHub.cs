@@ -20,8 +20,9 @@ namespace Web_chat.Hubs
                 {
                     Sender = user,
                     Text = message,
-                    //Timestamp = DateTime.Now
+                    Timestamp = DateTime.UtcNow  // <= ОБЯЗАТЕЛЬНО укажи время
                 };
+
                 _context.Messages.Add(msg);
                 await _context.SaveChangesAsync();
                 await Clients.All.SendAsync("ReceiveMessage", user, message);
@@ -29,8 +30,9 @@ namespace Web_chat.Hubs
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] SendMessage failed: {ex.Message}");
-                throw; // Чтобы клиент увидел, что была ошибка
+                throw;
             }
         }
+
     }
 }

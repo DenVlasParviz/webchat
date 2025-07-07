@@ -1,13 +1,21 @@
 <template>
- <chat-room></chat-room>
+<!--  <chat-room></chat-room>-->
+
+<sign-up-page></sign-up-page>
+ <router-view>
+    </router-view>
+
 
 </template>
 
 <script>
-import ChatRoom from "./components/ChatRoom.vue";
-export default {
-  components: {ChatRoom}
 
+import SignUpPage from './Pages/SignUpPage.vue'
+export default {
+components:{
+  SignUpPage,
+}
+  /*  components: { ChatRoom },*/
 }
 </script>
 

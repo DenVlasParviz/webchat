@@ -1,15 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-namespace Web_chat.Models;
-
-    public class ChatContext(DbContextOptions<ChatContext> options) : DbContext(options)
+namespace Web_chat.Models
+{
+    public class ChatContext : IdentityDbContext<User>
     {
-        // 1) Конструктор, принимающий DbContextOptions 
-      
-
-        public DbSet<Message> Messages => Set<Message>();
+        public ChatContext(DbContextOptions<ChatContext> options)
+            : base(options)
+        {
         }
-        
 
-        // 2) Набор сообщений
-    
+        public DbSet<Message> Messages { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            // тут можно добавить Fluent API-конфигурации, если нужно
+        }
+    }
+}

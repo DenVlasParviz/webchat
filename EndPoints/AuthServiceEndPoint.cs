@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using Web_chat.DTos.Records;
 using Web_chat.Models;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Web_chat.EndPoints;
 
@@ -34,10 +39,12 @@ public static class AuthServiceEndPoint
             // 5) Возвращаем 201 с информацией
             return Results.Created($"/users/{user.Id}", new { user.Id, user.UserName });
         });
+        //POST-запрос на вход в систему
         group.MapPost("signin", async (
             SignInDtos dto,
             UserManager<User> userManager,
-            SignInManager<User> signInManager
+            SignInManager<User> signInManager,
+            IConfiguration configuration
         ) =>
         {
             var user = await userManager.FindByNameAsync(dto.Username);
@@ -46,7 +53,23 @@ public static class AuthServiceEndPoint
             var result = await signInManager.PasswordSignInAsync(dto.Username, dto.Password, dto.RememberMe, false);
             if (!result.Succeeded)
                 return Results.BadRequest("Invalid username or password");
-            return Results.Ok(new { message = "Login successful" });
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+            var jwtSection = configuration.GetSection("Jwt");
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: jwtSection["Issuer"],
+                audience: jwtSection["Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: creds);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            return Results.Ok(new { token = tokenString, expiration = token.ValidTo });
         });
 
         return group;

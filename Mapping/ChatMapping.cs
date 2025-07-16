@@ -8,6 +8,6 @@ public static class ChatMapping
 {
     public static ChatMessagesDtos ToChatMessagesDts(this Message message)
     {
-        return new (message.Id,message.Sender,message.Text,message.Timestamp);
+        return new (message.Id,message.Sender.UserName,message.Text,message.Timestamp);
     } 
 }

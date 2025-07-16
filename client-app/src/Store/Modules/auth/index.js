@@ -2,16 +2,12 @@
 import mutations from './mutations'
 import actions from './actions'
 import getters from './getters'
+import state from './state'
 export default{
-  namespaced: true,
-  state(){
-
-    return{
-name:'Some name'
-    };
-     },
+ namespaced:true,
   mutations,
   getters,
   actions,
+  state
 }
 

@@ -438,3 +438,11 @@ C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\obj\Debug\net10.0\refi
 C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\obj\Debug\net10.0\Web-chat.pdb
 C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\obj\Debug\net10.0\Web-chat.genruntimeconfig.cache
 C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\obj\Debug\net10.0\ref\Web-chat.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Денис\Desktop\Programming\Web-chat\Web-chat\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll

@@ -2,10 +2,38 @@
 import ChatMessage from './ChatMessage.vue'
 import MessageBox from './MessageBox.vue'
 import SpeakerInfo from './SpeakerInfo.vue'
-import { Modal } from 'bootstrap'
 import * as signalR from '@microsoft/signalr'
-
+import {parseJwt} from '../Store/Modules/ParseJwt.js'
+import axios from 'axios'
 export default {
+  props:{
+    conversationId:{
+      type:[Number,String],
+      required:true
+    }
+  },
+  watch:{
+    conversationId:{
+      immediate:true,
+      handler(id){
+        if(!id){
+          this.messages=[];
+          return;
+        }
+        axios.get(`/api/chats/${id}/messages`,{
+          headers:{
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }).then(res=>
+        {
+          this.messages=res.data
+        }).catch(err=>{
+          console.error("повідомлення не завантажились",err)
+          this.error=err.toString()
+        })
+      }
+    }
+  },
   components: { SpeakerInfo, MessageBox, ChatMessage },
   /*  name: 'ChatRoom',
     data() {
@@ -76,12 +104,16 @@ export default {
         })
     }*/
   created() {
-    fetch(`/chat`).then((response) => {
-      response.json().then((data) => {
-        this.messages = data
-      })
+    fetch(`/api/chats/${this.conversationId}/messages`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
-    this.currentUser = localStorage.getItem('userName')
+      .then(response => {
+        if (!response.ok) throw new Error(response.statusText);
+        return response.json();
+      })
+      .then(data => { this.messages = data })
+      .catch(err => console.error('Не удалось получить историю сообщений:', err));
+
   },
   data() {
     return {
@@ -92,19 +124,40 @@ export default {
       modalEl: null,
       messages: [],
       currentUser: null,
+
     }
   },
   mounted() {
+    console.log('🐣 Chatroom mounted!')
+
     // 1. Создаём объект подключения
     this.connection = new signalR.HubConnectionBuilder()
-      // Используем относительный URL, потому что Vite-прокси перенаправит его на ваш ASP.NET
-      .withUrl('/hubs/chat')
-      .withAutomaticReconnect() // чтобы сам пытаcь переподключаться при обрыве
-      .build()
+      .withUrl('/hubs/chat', {
+        accessTokenFactory: () => {
+          const token = localStorage.getItem('token')
+          console.log('🔑 Отправляется токен:', token)
+          return token
+        },
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets  // 👈 Это ключ!
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    const token = localStorage.getItem('token')
+    if (token) {
+      let payload
+      try {
+        payload = parseJwt(token)
+      } catch (e) {
+        console.error('❌ parseJwt error:', e)
+      }
+      console.log('📦 JWT payload:', payload)
+      this.currentUser=payload.unique_name;
+      // теперь посмотрите в консоли, какие у payload есть поля
+    }
     // 2. Подписываемся на событие, которое придёт с сервера
-    //    'ReceiveMessage' — это имя, которое мы объявили в хабе (Clients.All.SendAsync("ReceiveMessage", ...))
     this.connection.on('ReceiveMessage', (name, message) => {
-      // Когда приходит новый текст, добавляем в массив
       this.messages.push({ name, message })
       // Можно при желании: скроллить окно чата вниз или показать уведомление
     })
@@ -120,18 +173,13 @@ export default {
         this.error = err.toString()
         console.error('Ошибка подключения SignalR:', err)
       })
-    this.modalEl = document.getElementById('nameModal')
-    this.bsModal = new Modal(this.modalEl, { backdrop: true })
-    if (!localStorage.getItem('userName')) {
-      this.bsModal.show()
-    }
+
   },
 
   methods: {
-    onSave() {
-      // сохранение имени пользователя при нажатии на кнопку Save
-      localStorage.setItem('userName', this.userName)
-      this.bsModal.hide()
+    setConversation(id) {
+      this.activeConversationId = id
+      console.log('📌 Активный чат:', id)
     },
     sendMessage() {
       if (!this.isConnected) {
@@ -139,9 +187,14 @@ export default {
         return
       }
 
-      // Вызываем метод хаба SendMessage(user, message)
+      if (!this.conversationId) {
+        console.error('❌ Нет выбранного чата (conversationId)')
+        return
+      }
+
+
       this.connection
-        .invoke('SendMessage', this.currentUser, this.userMessage)
+        .invoke('SendMessage',  this.userMessage, this.conversationId)
         .then(() => {
           // После успешной отправки очищаем поле ввода
           this.userMessage = ''
@@ -156,55 +209,8 @@ export default {
 </script>
 
 <template>
-  <div class="modal fade" id="nameModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Modal title</h5>
-        </div>
-        <div class="modal-body">
-          <label for="user-name" class="form-label">Your name here</label>
-          <input type="text" class="form-control" id="user-name" v-model="userName" />
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-dismiss="modal"
-            @click.prevent="onSave"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--  <div class="container" >
-    &lt;!&ndash; Секция отправки &ndash;&gt;
-    <div class="margin-bottom: 1rem;">
-      <label for="name-input">Name</label>
-      <input id="name-input" v-model="userName" placeholder="Ваше имя" />
-      <label for="text-input" style="margin-left: 0.5rem;">Text</label>
-      <input id="text-input" v-model="newMessage" placeholder="Введите сообщение" />
 
-      <button @click="sendMessage" style="margin-left: 0.5rem;">Send</button>
-    </div>
 
-    &lt;!&ndash; Секция получения &ndash;&gt;
-    <div>
-      <p><em>Received messages:</em></p>
-      <p v-for="(item, index) in messages" :key="index">
-        <strong>{{ item.user }}:</strong> {{ item.message }}
-      </p>
-    </div>
-    <div>
-      <p> Старые сообщения</p>
-      <p v-for="(msg,idx) in historyMessages" >
-        <strong>{{ msg.name }}:</strong> {{ msg.message }}
-        <small>{{ new Date(msg.timestamp).toLocaleTimeString() }}</small>
-      </p>
-    </div>
-  </div>-->
   <div class="container">
     <div class="row no-gutters">
       <div class="col-md-4 border-right">

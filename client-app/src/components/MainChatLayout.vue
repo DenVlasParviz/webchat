@@ -2,9 +2,9 @@
   <div class="chat-layout">
     <aside class="sidebar">
       <users-list @chat-started="openChat"/>
-      <conversations-list :conversations="conversations" @select="openChat"/>
+      <conversations-list :conversations="conversations" :conversation-id="activeId" @select="openChat"/>
     </aside>
-    <chat-window :conversation-id="activeId" v-if="activeId"/>
+    <chat-window :conversation-id="activeId" v-if="activeId" />
   </div>
 </template>
 
@@ -16,28 +16,52 @@ import axios from 'axios'
 
 export default {
   components: { UsersList, ConversationsList, ChatWindow },
+  props:{
+    conversationId:{
+      type:[Number,String],
+      default:null
+    }
+  },
   data() {
     return {
       conversations: [],
-      activeId: null
+
+      activeId: this.conversationId,
     }
   },
+  watch:{
+    conversationId:{
+      immediate:true,
+      handler(val){
+        this.activeId=val;
+      }
+    }
+  },
+
   async mounted() {
     try {
       const res = await axios.get('/api/chats', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       this.conversations = res.data
+
+      // если при заходе URL указывал несуществующий чат — почистим activeId
+      if (this.activeId && !this.conversations.find(c => c.id === +this.activeId)) {
+        this.activeId = null
+        if (this.conversationId && this.conversations.some(c => c.id === +this.conversationId)){
+          this.openChat(this.conversationId)
+        }
+      }
     } catch (err) {
       console.error('Ошибка при загрузке чатов:', err)
     }
   },
   methods: {
     openChat(convId) {
-      console.log('🏷️ clicked conversation:', convId)
+      // 4) пишем в локалку, чтобы моментально отрендерить окно
       this.activeId = convId
+      //    и меняем URL
+      this.$router.push({ path: `/users/${convId}` })
     }
   }
 }

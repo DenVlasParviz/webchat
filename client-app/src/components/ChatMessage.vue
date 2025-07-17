@@ -6,7 +6,11 @@ export default {
   },
   computed: {
     isMine() {
-      return this.message.sender === this.currentUser
+      const sender = this.message.sender // подстраховка
+      const mine = sender === this.currentUser
+
+
+      return mine
     },
     containerClass() {
       return {
@@ -29,6 +33,7 @@ export default {
     <div class="row no-gutters">
       <div :class="containerClass">
         <div :class="bubbleClass">
+
           {{ message.text }}
         </div>
       </div>

@@ -35,74 +35,7 @@ export default {
     }
   },
   components: { SpeakerInfo, MessageBox, ChatMessage },
-  /*  name: 'ChatRoom',
-    data() {
-      return {
-        connection: null,    // здесь будет наш HubConnection
-        userName: '',        // поле для имени пользователя
-        newMessage: '',      // текущее сообщение, которое вводят
-        messages: [],
-        historyMessages:[],// массив всех пришедших сообщений
-        isConnected: false,  // флаг, что соединение установлено
-        error: null          // ошибка, если не получилось подключиться
-      }
-    },
-    created() {
-      fetch(`/chat`).then(response => { response.json().then(data => {
-        this.historyMessages = data;
 
-      })})
-    },
-    methods: {
-      sendMessage() {
-        // Не отправляем пустое:
-        if (!this.userName || !this.newMessage) return
-
-        // Меняем флаг на случай, если соединение оборвалось:
-        if (!this.isConnected) {
-          this.error = 'Нет соединения с сервером'
-          return
-        }
-
-        // Вызываем метод хаба SendMessage(user, message)
-        this.connection.invoke('SendMessage', this.userName, this.newMessage)
-          .then(() => {
-            // После успешной отправки очищаем поле ввода
-            this.newMessage = ''
-          })
-          .catch(err => {
-            console.error('Ошибка при отправке сообщения:', err)
-            this.error = err.toString()
-          })
-      }
-    },
-    mounted() {
-      // 1. Создаём объект подключения
-      this.connection = new signalR.HubConnectionBuilder()
-        // Используем относительный URL, потому что Vite-прокси перенаправит его на ваш ASP.NET
-        .withUrl('/hubs/chat')
-        .withAutomaticReconnect()  // чтобы сам пытаcь переподключаться при обрыве
-        .build()
-
-      // 2. Подписываемся на событие, которое придёт с сервера
-      //    'ReceiveMessage' — это имя, которое мы объявили в хабе (Clients.All.SendAsync("ReceiveMessage", ...))
-      this.connection.on('ReceiveMessage', (user, message) => {
-        // Когда приходит новый текст, добавляем в массив
-        this.messages.push({ user, message })
-        // Можно при желании: скроллить окно чата вниз или показать уведомление
-      })
-
-      // 3. Запускаем соединение
-      this.connection.start()
-        .then(() => {
-          this.isConnected = true  // флаг, что всё в порядке
-        })
-        .catch(err => {
-          // если что-то пошло не так — сохраним текст ошибки
-          this.error = err.toString()
-          console.error('Ошибка подключения SignalR:', err)
-        })
-    }*/
   created() {
     fetch(`/api/chats/${this.conversationId}/messages`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -128,14 +61,18 @@ export default {
     }
   },
   mounted() {
-    console.log('🐣 Chatroom mounted!')
 
     // 1. Создаём объект подключения
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl('/hubs/chat', {
         accessTokenFactory: () => {
           const token = localStorage.getItem('token')
-          console.log('🔑 Отправляется токен:', token)
+          if (token) {
+            const payload = parseJwt(token)
+            const nameClaim = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
+            this.currentUser = nameClaim ?? payload.sub
+            console.log('ChatRoom: currentUser =', this.currentUser)
+          }
           return token
         },
         skipNegotiation: true,
@@ -152,13 +89,14 @@ export default {
       } catch (e) {
         console.error('❌ parseJwt error:', e)
       }
-      console.log('📦 JWT payload:', payload)
       this.currentUser=payload.unique_name;
       // теперь посмотрите в консоли, какие у payload есть поля
     }
     // 2. Подписываемся на событие, которое придёт с сервера
     this.connection.on('ReceiveMessage', (name, message) => {
-      this.messages.push({ name, message })
+      this.messages.push({
+        sender:name,
+        text: message })
       // Можно при желании: скроллить окно чата вниз или показать уведомление
     })
 
@@ -233,6 +171,7 @@ export default {
           </div>
         </div>
         <message-box></message-box>
+
       </div>
       <div class="col-md-8 chat-wrapper">
         <speaker-info></speaker-info>

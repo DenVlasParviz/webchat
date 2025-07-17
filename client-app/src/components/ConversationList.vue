@@ -17,7 +17,8 @@
 <script>
 export default {
   props: {
-    conversations: { type: Array, required: true }
+    conversations: { type: Array, required: true},
+
   }
 }
 </script>

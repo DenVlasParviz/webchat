@@ -14,6 +14,8 @@ namespace Web_chat.Models
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<ConversationUser> ConversationUsers { get; set; }
         
+        public DbSet<LastMessage> LastMessages { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,8 +40,10 @@ namespace Web_chat.Models
             builder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany(u => u.Messages)
-                .HasForeignKey(m => m.SenderId)
-                .OnDelete(DeleteBehavior.SetNull);  
+                .HasForeignKey(m => m.SenderId) 
+                .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<LastMessage>().ToView("LastMessages").HasNoKey();
         }
     }
 }

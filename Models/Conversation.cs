@@ -1,4 +1,6 @@
-﻿namespace Web_chat.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Web_chat.Models;
 
 public class Conversation
 {
@@ -6,5 +8,6 @@ public class Conversation
     public string Name { get; set; }
     public ICollection<ConversationUser> Users { get; set; } = new List<ConversationUser>();
     public ICollection<Message> Messages { get; set; } = new List<Message>();
-
+    
+    
 }

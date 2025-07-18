@@ -4,7 +4,7 @@ import MessageBox from './MessageBox.vue'
 import SpeakerInfo from './SpeakerInfo.vue'
 import * as signalR from '@microsoft/signalr'
 import {parseJwt} from '../Store/Modules/ParseJwt.js'
-import axios from 'axios'
+import { mapGetters,mapActions } from 'vuex'
 export default {
   props:{
     conversationId:{
@@ -12,42 +12,17 @@ export default {
       required:true
     }
   },
-  watch:{
-    conversationId:{
-      immediate:true,
-      handler(id){
-        if(!id){
-          this.messages=[];
-          return;
-        }
-        axios.get(`/api/chats/${id}/messages`,{
-          headers:{
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        }).then(res=>
-        {
-          this.messages=res.data
-        }).catch(err=>{
-          console.error("повідомлення не завантажились",err)
-          this.error=err.toString()
-        })
+  watch: {
+    conversationId: {
+      immediate: true,
+      handler(id) {
+        if (id) this.loadMessages(id)
       }
     }
   },
   components: { SpeakerInfo, MessageBox, ChatMessage },
 
-  created() {
-    fetch(`/api/chats/${this.conversationId}/messages`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
-      .then(response => {
-        if (!response.ok) throw new Error(response.statusText);
-        return response.json();
-      })
-      .then(data => { this.messages = data })
-      .catch(err => console.error('Не удалось получить историю сообщений:', err));
 
-  },
   data() {
     return {
       connection: null,
@@ -55,93 +30,99 @@ export default {
       userMessage: '',
       bsModal: null,
       modalEl: null,
-      messages: [],
       currentUser: null,
 
     }
   },
+  computed: {
+    ...mapGetters('messages', { rawMessages: 'getMessages' }),
+    messages() {
+      return this.rawMessages(this.conversationId)
+    }
+  },
   mounted() {
-
-    // 1. Создаём объект подключения
-    this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('/hubs/chat', {
-        accessTokenFactory: () => {
-          const token = localStorage.getItem('token')
-          if (token) {
-            const payload = parseJwt(token)
-            const nameClaim = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
-            this.currentUser = nameClaim ?? payload.sub
-            console.log('ChatRoom: currentUser =', this.currentUser)
-          }
-          return token
-        },
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets  // 👈 Это ключ!
-      })
-      .withAutomaticReconnect()
-      .build();
-
+    // 1) Извлекаем currentUser из JWT
     const token = localStorage.getItem('token')
     if (token) {
-      let payload
-      try {
-        payload = parseJwt(token)
-      } catch (e) {
-        console.error('❌ parseJwt error:', e)
-      }
-      this.currentUser=payload.unique_name;
-      // теперь посмотрите в консоли, какие у payload есть поля
+      const payload = parseJwt(token)
+      const nameClaim =
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
+      this.currentUser = nameClaim ?? payload.sub
     }
-    // 2. Подписываемся на событие, которое придёт с сервера
-    this.connection.on('ReceiveMessage', (name, message) => {
-      this.messages.push({
-        sender:name,
-        text: message })
-      // Можно при желании: скроллить окно чата вниз или показать уведомление
+
+    // 2) Настраиваем SignalR
+    this.connection = new signalR.HubConnectionBuilder()
+      .withUrl('/hubs/chat', {
+        accessTokenFactory: () => localStorage.getItem('token'),
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets
+      })
+      .withAutomaticReconnect()
+      .build()
+
+    // 3) Приход новых сообщений — пушим их в Vuex через мутацию
+    this.connection.on('ReceiveMessage', (sender, text) => {
+      const now = new Date()
+
+      this.$store.commit('messages/pushMessage', {
+        chatId: this.conversationId,
+        message: {
+          id: Date.now(),
+          sender,
+          text,
+          timestamp: now
+        }
+      })
+
+      this.$store.commit('messages/setLastMessages', {
+        chatId: this.conversationId,
+        message: {
+          sender,
+          text,
+          timestamp: now
+        }
+      })
     })
 
-    // 3. Запускаем соединение
+
+
+    // 4) Стартуем соединение
     this.connection
       .start()
       .then(() => {
-        this.isConnected = true // флаг, что всё в порядке
+        this.isConnected = true
       })
-      .catch((err) => {
-        // если что-то пошло не так — сохраним текст ошибки
-        this.error = err.toString()
+      .catch(err => {
         console.error('Ошибка подключения SignalR:', err)
+        this.error = err.toString()
       })
-
   },
 
   methods: {
-    setConversation(id) {
-      this.activeConversationId = id
-      console.log('📌 Активный чат:', id)
-    },
+    ...mapActions('messages', ['loadMessages']),
+
+    // Отправить сообщение через SignalR
     sendMessage() {
       if (!this.isConnected) {
         this.error = 'Нет соединения с сервером'
         return
       }
-
       if (!this.conversationId) {
-        console.error('❌ Нет выбранного чата (conversationId)')
+        this.error = 'Не выбран чат'
         return
       }
 
-
       this.connection
-        .invoke('SendMessage',  this.userMessage, this.conversationId)
+        .invoke('SendMessage', this.userMessage, this.conversationId)
         .then(() => {
-          // После успешной отправки очищаем поле ввода
           this.userMessage = ''
         })
-        .catch((err) => {
-          console.error('Ошибка при отправке сообщения:', err)
+        .catch(err => {
+          console.error('Ошибка отправки сообщения:', err)
           this.error = err.toString()
         })
-    },
+    }
+
   },
 }
 </script>

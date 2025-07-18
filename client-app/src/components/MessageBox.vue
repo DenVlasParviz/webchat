@@ -3,14 +3,25 @@ import {mapGetters,mapActions} from 'vuex'
 export default{
   computed:{
     ...mapGetters('chat',['getChats']),
+...mapGetters('messages',['getLastMessage']),
 
   },
   methods:{
-    ...mapActions('chat',['loadChats'])
+    ...mapActions('chat',['loadChats']),
+      ...mapActions('messages',['fetchLastMessage']),
+
+
 
   },
   mounted() {
-    this.loadChats()
+    console.log('typeof getLastMessages', typeof this.getLastMessage)
+    console.log('getLastMessages', this.getLastMessage)
+
+    this.loadChats().then(() => {
+      this.getChats.forEach(chat => {
+        this.fetchLastMessage(chat.id)
+      })
+    })
   }
 }
 
@@ -28,7 +39,9 @@ export default{
     />
     <div class="text">
       <h6>{{ chat.name }}</h6>
-      <p class="text-muted">test</p>
+      <p v-if="getLastMessage(chat.id)">
+        {{ getLastMessage(chat.id).text }}
+      </p>
     </div>
     <span class="time text-muted small">13:21</span>
   </div>

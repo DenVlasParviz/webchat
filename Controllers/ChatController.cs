@@ -55,6 +55,30 @@ public class ChatController :ControllerBase
        await _db.SaveChangesAsync();
        return NoContent();
    }
+
+   [HttpGet("last-messages")]
+   public async Task<IEnumerable<LastMessageDto>> GetLastMessages()
+   {
+     
+       var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+       var conversationIds = await _db.ConversationUsers
+           .Where(cu => cu.UserId == userId)
+           .Select(cu => cu.ConversationId)
+           .ToListAsync();
+
+       var list = await _db.LastMessages
+           .Where(v => conversationIds.Contains(v.ConversationId))
+           .ToListAsync();
+
+       return list
+           .Select(v => new LastMessageDto(
+               v.ConversationId,
+               v.SenderId.ToString(),
+               v.Text,
+               v.Timestamp))
+           .ToList();
+   }
    
 
 }

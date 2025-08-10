@@ -1,21 +1,21 @@
 <template>
   <div class="chat-layout">
     <aside class="sidebar">
+<!--
       <users-list @chat-started="openChat"/>
-      <conversations-list :conversations="conversations" :conversation-id="activeId" @select="openChat"/>
+-->
     </aside>
-    <chat-window :conversation-id="activeId" v-if="activeId" />
+    <chat-window :conversation-id="activeId"  @open-chat="openChat" />
   </div>
 </template>
 
 <script>
-import UsersList from './UsersList.vue'
-import ConversationsList from './ConversationList.vue'
 import ChatWindow from './ChatRoom.vue'
 import axios from 'axios'
 
 export default {
-  components: { UsersList, ConversationsList, ChatWindow },
+
+  components: {  ChatWindow },
   props:{
     conversationId:{
       type:[Number,String],

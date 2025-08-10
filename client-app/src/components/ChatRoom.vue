@@ -128,8 +128,6 @@ export default {
 </script>
 
 <template>
-
-
   <div class="container">
     <div class="row no-gutters">
       <div class="col-md-4 border-right">
@@ -151,10 +149,9 @@ export default {
             <input placeholder="Search here" type="text" />
           </div>
         </div>
-        <message-box></message-box>
-
+        <message-box @open-chat="$emit('open-chat',$event)" />
       </div>
-      <div class="col-md-8 chat-wrapper">
+      <div class="col-md-8 chat-wrapper"  >
         <speaker-info></speaker-info>
         <div class="messages-area">
           <chat-message
@@ -162,7 +159,7 @@ export default {
             :key="msg.id"
             :message="msg"
             :current-user="currentUser"
-          ></chat-message>
+          > </chat-message>
         </div>
         <div class="row">
           <div class="col-12">

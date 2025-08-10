@@ -1,6 +1,7 @@
 <script>
 import {mapGetters,mapActions} from 'vuex'
 export default{
+  emits: ["open-chat"],
   computed:{
     ...mapGetters('chat',['getChats']),
 ...mapGetters('messages',['getLastMessage']),
@@ -9,8 +10,6 @@ export default{
   methods:{
     ...mapActions('chat',['loadChats']),
       ...mapActions('messages',['fetchLastMessage']),
-
-
 
   },
   mounted() {
@@ -30,7 +29,9 @@ export default{
 </script>
 
 <template>
-  <div v-for="chat in getChats" :key="chat.id" class="friend-drawer friend-drawer--onhover">
+  <div v-for="chat in getChats" :key="chat.id" class="friend-drawer friend-drawer--onhover"
+       @click="$emit('open-chat', chat.id)"
+  >
 
     <img
       class="profile-image"

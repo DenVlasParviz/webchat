@@ -186,6 +186,30 @@ namespace Web_chat.Migrations
                     b.ToTable("ConversationUsers");
                 });
 
+            modelBuilder.Entity("Web_chat.Models.LastMessage", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("LastMessages", (string)null);
+                });
+
             modelBuilder.Entity("Web_chat.Models.Message", b =>
                 {
                     b.Property<int>("Id")

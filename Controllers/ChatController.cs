@@ -74,7 +74,7 @@ public class ChatController :ControllerBase
        return list
            .Select(v => new LastMessageDto(
                v.ConversationId,
-               v.SenderId.ToString(),
+               v.SenderId,
                v.Text,
                v.Timestamp))
            .ToList();

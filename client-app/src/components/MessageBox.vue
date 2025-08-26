@@ -4,13 +4,11 @@ export default{
   emits: ["open-chat"],
   computed:{
     ...mapGetters('chat',['getChats']),
-...mapGetters('messages',['getLastMessage']),
-
+    ...mapGetters('messages',['getLastMessage']),
   },
   methods:{
     ...mapActions('chat',['loadChats']),
-      ...mapActions('messages',['fetchLastMessage']),
-
+    ...mapActions('messages',['fetchLastMessage']),
   },
   mounted() {
     console.log('typeof getLastMessages', typeof this.getLastMessage)
@@ -23,19 +21,15 @@ export default{
     })
   }
 }
-
-
-
 </script>
 
 <template>
   <div v-for="chat in getChats" :key="chat.id" class="friend-drawer friend-drawer--onhover"
        @click="$emit('open-chat', chat.id)"
   >
-
     <img
       class="profile-image"
-      src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
+      src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
       alt=""
     />
     <div class="text">

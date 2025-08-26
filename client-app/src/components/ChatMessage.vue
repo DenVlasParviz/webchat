@@ -8,14 +8,12 @@ export default {
     isMine() {
       const sender = this.message.sender // подстраховка
       const mine = sender === this.currentUser
-
-
       return mine
     },
     containerClass() {
       return {
-        'col-md-3': true,
-        'offset-md-9': this.isMine,
+        'col-md-9': true, // <-- Исправлено
+        'offset-md-3': this.isMine, // <-- Тоже надо исправить
       }
     },
     bubbleClass() {
@@ -33,7 +31,6 @@ export default {
     <div class="row no-gutters">
       <div :class="containerClass">
         <div :class="bubbleClass">
-
           {{ message.text }}
         </div>
       </div>

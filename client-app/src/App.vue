@@ -1,3 +1,4 @@
+
 <template>
 <!--  <chat-room></chat-room>-->
 
@@ -12,8 +13,12 @@
       <router-link to="/signup" class="navbar-brand">Sign Up</router-link>
     </li>
     <li class="nav-item">
-      <router-link to="/users" class="navbar-brand">Users</router-link>
+      <router-link to="/users-list" class="navbar-brand">Users</router-link>
     </li>
+    <li class="nav-item">
+      <router-link to="/" class="navbar-brand">Home</router-link>
+    </li>
+
 
   </div>
 </nav>
@@ -32,6 +37,4 @@ components:{
 }
 </script>
 
-<style>
-/* Можно оставить пустым или добавить несколько базовых стилей */
-</style>
+<style src="./assets/base.css"></style>

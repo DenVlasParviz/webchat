@@ -66,7 +66,7 @@ public static class AuthServiceEndPoint
                 issuer: jwtSection["Issuer"],
                 audience: jwtSection["Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(540),
                 signingCredentials: creds);
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             return Results.Ok(new { token = tokenString, expiration = token.ValidTo });

@@ -80,5 +80,22 @@ public class ChatController :ControllerBase
            .ToList();
    }
    
+   [HttpGet("{conversationId}/users")]
+   public async Task<IEnumerable<UserDto>> GetConversationUsers(int conversationId)
+   {
+       var users = await _db.ConversationUsers
+           .Where(cu => cu.ConversationId == conversationId)
+           .Join(
+               _db.Users,
+               cu => cu.UserId,
+               u => u.Id,
+               (cu, u) => new UserDto(u.Id, u.UserName)
+           )
+           .ToListAsync();
+
+       return users;
+   }
+
+   
 
 }

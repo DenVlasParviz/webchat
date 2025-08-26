@@ -22,7 +22,6 @@ export default {
   },
   components: { SpeakerInfo, MessageBox, ChatMessage },
 
-
   data() {
     return {
       connection: null,
@@ -31,7 +30,6 @@ export default {
       bsModal: null,
       modalEl: null,
       currentUser: null,
-
     }
   },
   computed: {
@@ -84,8 +82,6 @@ export default {
       })
     })
 
-
-
     // 4) Стартуем соединение
     this.connection
       .start()
@@ -122,7 +118,6 @@ export default {
           this.error = err.toString()
         })
     }
-
   },
 }
 </script>
@@ -134,13 +129,13 @@ export default {
         <div class="settings-tray">
           <img
             class="profile-image"
-            src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/filip.jpg"
+            src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
             alt="Profile img"
           />
           <span class="settings-tray--right">
-            <i class="material-icons">cached</i>
-            <i class="material-icons">message</i>
-            <i class="material-icons">menu</i>
+<!--            <i class="material-icons">cached</i>-->
+<!--            <i class="material-icons">message</i>-->
+<!--            <i class="material-icons">menu</i>-->
           </span>
         </div>
         <div class="search-box">
@@ -151,7 +146,7 @@ export default {
         </div>
         <message-box @open-chat="$emit('open-chat',$event)" />
       </div>
-      <div class="col-md-8 chat-wrapper"  >
+      <div class="col-md-8 chat-wrapper">
         <speaker-info></speaker-info>
         <div class="messages-area">
           <chat-message

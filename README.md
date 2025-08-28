@@ -1,40 +1,38 @@
 # Real-time WebChat
 
-Веб-додаток для чату в реальному часі. Підтримує аутентифікацію користувачів, обмін миттєвими повідомленнями та збереження історії чатів.
+Web application for real-time chat. Supports user authentication, instant messaging, and chat history storage.
 
 ---
 
-## Зміст
-- [Огляд](#огляд)
-- [Вимоги](#вимоги)
-- [База даних](#база-даних-та-примітки)
-- [Скріншоти](#скріншоти)
-
+## Contents
+- [Overview](#overview)
+- [Requirements](#requirements)
+- [Database](#database-and-notes)
+- [Screenshots](#screenshots)
 
 ---
 
-## Огляд
-Бекенд побудовано на **ASP.NET Core** з використанням **SignalR** для двостороннього зв'язку в реальному часі та **ASP.NET Core Identity** для аутентифікації. Фронтенд розроблено на **Vue.js**. Усі дані зберігаються в базі даних **PostgreSQL**.
+## Overview
+The backend is built with **ASP.NET Core** using **SignalR** for real-time bidirectional communication and **ASP.NET Core Identity** for authentication. The frontend is developed with **Vue.js**. All data is stored in a **PostgreSQL** database.
 
-
-## Вимоги
+## Requirements
 - Node.js >= 16  
-- npm 
+- npm  
 - .NET  
 - PostgreSQL
 
-## Локальна інсталяція та запуск
-1. Встановити залежності:
+## Local installation and running
+1. Install dependencies:
 ```bash
-# сервер
+# server
 cd server
 npm install
 
-# клієнт
+# client
 cd ../client
 npm install
 ```
-Оновіть файл `appsettings.json` з відповідними даними:
+Update the `appsettings.json` file with the appropriate values:
 ```json
 {
   "ConnectionStrings": {
@@ -47,9 +45,9 @@ npm install
 ```
 ---
 
-## База даних та примітки
-- PostgreSQL використовується для зберігання даних про користувачів (з Identity) та історії повідомлень
-- Щоб отримувати останнє повідомлення, потрібно створити view в Views
+## Database and notes
+- PostgreSQL is used to store user data (with Identity) and message history  
+- To get the latest message, you need to create a view in Views:
 ```bash
 CREATE OR REPLACE VIEW "LastMessages" AS
 SELECT m1."ConversationId", m1."Id", m1."SenderId", m1."Text", m1."Timestamp"
@@ -61,7 +59,6 @@ WHERE m1."Timestamp" = (
 );
 ``` 
 
-## Скріншоти
+## Screenshots
 
 <img width="1905" height="879" alt="firefox_a8HUFAs5d6" src="https://github.com/user-attachments/assets/bc02af67-5483-45a1-9ea9-000fa7c095f2" />
-
